@@ -10,4 +10,5 @@ test/__app
 *.log
 dist
 shrinkwrap.yaml
+package-lock.json
 !/test-helpers/__app/
