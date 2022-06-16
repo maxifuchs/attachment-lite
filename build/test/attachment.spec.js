@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
-const japa_1 = __importDefault(require("japa"));
+const runner_1 = require("@japa/runner");
 const path_1 = require("path");
 const supertest_1 = __importDefault(require("supertest"));
 const http_1 = require("http");
@@ -21,17 +21,17 @@ const Attachment_1 = require("../src/Attachment");
 const test_helpers_1 = require("../test-helpers");
 const promises_1 = require("fs/promises");
 let app;
-japa_1.default.group('Attachment | fromDbResponse', (group) => {
-    group.before(async () => {
+runner_1.test.group('Attachment | fromDbResponse', (group) => {
+    group.setup(async () => {
         app = await (0, test_helpers_1.setupApplication)();
         await (0, test_helpers_1.setup)(app);
         app.container.resolveBinding('Adonis/Core/Route').commit();
         Attachment_1.Attachment.setDrive(app.container.resolveBinding('Adonis/Core/Drive'));
     });
-    group.after(async () => {
+    group.teardown(async () => {
         await (0, test_helpers_1.cleanup)(app);
     });
-    (0, japa_1.default)('create attachment instance from db response', (assert) => {
+    (0, runner_1.test)('create attachment instance from db response', ({ assert }) => {
         const attachment = Attachment_1.Attachment.fromDbResponse(JSON.stringify({
             size: 1440,
             name: 'foo.jpg',
@@ -41,7 +41,7 @@ japa_1.default.group('Attachment | fromDbResponse', (group) => {
         assert.isTrue(attachment?.isPersisted);
         assert.isFalse(attachment?.isLocal);
     });
-    (0, japa_1.default)('save method should result in noop when attachment is created from db response', async (assert) => {
+    (0, runner_1.test)('save method should result in noop when attachment is created from db response', async ({ assert, }) => {
         const attachment = Attachment_1.Attachment.fromDbResponse(JSON.stringify({
             size: 1440,
             name: 'foo.jpg',
@@ -51,11 +51,11 @@ japa_1.default.group('Attachment | fromDbResponse', (group) => {
         await attachment?.save();
         assert.equal(attachment?.name, 'foo.jpg');
     });
-    (0, japa_1.default)('Attachment should be null when db response is null', async (assert) => {
+    (0, runner_1.test)('Attachment should be null when db response is null', async ({ assert }) => {
         const attachment = Attachment_1.Attachment.fromDbResponse(null);
         assert.isNull(attachment);
     });
-    (0, japa_1.default)('delete persisted file', async (assert) => {
+    (0, runner_1.test)('delete persisted file', async ({ assert }) => {
         const attachment = Attachment_1.Attachment.fromDbResponse(JSON.stringify({
             size: 1440,
             name: 'foo.jpg',
@@ -65,7 +65,7 @@ japa_1.default.group('Attachment | fromDbResponse', (group) => {
         await attachment?.delete();
         assert.isTrue(attachment?.isDeleted);
     });
-    (0, japa_1.default)('compute file url', async (assert) => {
+    (0, runner_1.test)('compute file url', async ({ assert }) => {
         const attachment = Attachment_1.Attachment.fromDbResponse(JSON.stringify({
             size: 1440,
             name: 'foo.jpg',
@@ -76,7 +76,7 @@ japa_1.default.group('Attachment | fromDbResponse', (group) => {
         await attachment?.computeUrl();
         assert.match(attachment?.url, /\/uploads\/foo\.jpg\?signature=/);
     });
-    (0, japa_1.default)('compute file url from a custom method', async (assert) => {
+    (0, runner_1.test)('compute file url from a custom method', async ({ assert }) => {
         const attachment = Attachment_1.Attachment.fromDbResponse(JSON.stringify({
             size: 1440,
             name: 'foo.jpg',
@@ -92,17 +92,17 @@ japa_1.default.group('Attachment | fromDbResponse', (group) => {
         assert.equal(attachment?.url, '/foo.jpg');
     });
 });
-japa_1.default.group('Attachment | fromFile', (group) => {
-    group.before(async () => {
+runner_1.test.group('Attachment | fromFile', (group) => {
+    group.setup(async () => {
         app = await (0, test_helpers_1.setupApplication)();
         await (0, test_helpers_1.setup)(app);
         app.container.resolveBinding('Adonis/Core/Route').commit();
         Attachment_1.Attachment.setDrive(app.container.resolveBinding('Adonis/Core/Drive'));
     });
-    group.after(async () => {
+    group.teardown(async () => {
         await (0, test_helpers_1.cleanup)(app);
     });
-    (0, japa_1.default)('create attachment from the user uploaded file', async (assert) => {
+    (0, runner_1.test)('create attachment from the user uploaded file', async ({ assert }) => {
         const server = (0, http_1.createServer)((req, res) => {
             const ctx = app.container.resolveBinding('Adonis/Core/HttpContext').create('/', {}, req, res);
             app.container.make(BodyParser_1.BodyParserMiddleware).handle(ctx, async () => {
@@ -121,7 +121,7 @@ japa_1.default.group('Attachment | fromFile', (group) => {
         const Drive = app.container.resolveBinding('Adonis/Core/Drive');
         assert.isTrue(await Drive.exists(body.name));
     });
-    (0, japa_1.default)('store attachment inside a nested folder', async (assert) => {
+    (0, runner_1.test)('store attachment inside a nested folder', async ({ assert }) => {
         const server = (0, http_1.createServer)((req, res) => {
             const ctx = app.container.resolveBinding('Adonis/Core/HttpContext').create('/', {}, req, res);
             app.container.make(BodyParser_1.BodyParserMiddleware).handle(ctx, async () => {
@@ -142,7 +142,7 @@ japa_1.default.group('Attachment | fromFile', (group) => {
         assert.isTrue(body.name.startsWith('users/avatars'));
         assert.isTrue(await Drive.exists(body.name));
     });
-    (0, japa_1.default)('pre compute url for newly created file', async (assert) => {
+    (0, runner_1.test)('pre compute url for newly created file', async ({ assert }) => {
         const server = (0, http_1.createServer)((req, res) => {
             const ctx = app.container.resolveBinding('Adonis/Core/HttpContext').create('/', {}, req, res);
             app.container.make(BodyParser_1.BodyParserMiddleware).handle(ctx, async () => {
@@ -161,7 +161,7 @@ japa_1.default.group('Attachment | fromFile', (group) => {
             .attach('avatar', (0, path_1.join)(__dirname, '../cat.jpeg'));
         assert.isDefined(body.url);
     });
-    (0, japa_1.default)('delete local file', async (assert) => {
+    (0, runner_1.test)('delete local file', async ({ assert }) => {
         const server = (0, http_1.createServer)((req, res) => {
             const ctx = app.container.resolveBinding('Adonis/Core/HttpContext').create('/', {}, req, res);
             app.container.make(BodyParser_1.BodyParserMiddleware).handle(ctx, async () => {
@@ -183,17 +183,17 @@ japa_1.default.group('Attachment | fromFile', (group) => {
         assert.isDefined(body.url);
     });
 });
-japa_1.default.group('Attachment | fromBuffer', (group) => {
-    group.before(async () => {
+runner_1.test.group('Attachment | fromBuffer', (group) => {
+    group.setup(async () => {
         app = await (0, test_helpers_1.setupApplication)();
         await (0, test_helpers_1.setup)(app);
         app.container.resolveBinding('Adonis/Core/Route').commit();
         Attachment_1.Attachment.setDrive(app.container.resolveBinding('Adonis/Core/Drive'));
     });
-    group.after(async () => {
+    group.teardown(async () => {
         await (0, test_helpers_1.cleanup)(app);
     });
-    (0, japa_1.default)('create attachment from the user-provided buffer', async (assert) => {
+    (0, runner_1.test)('create attachment from the user-provided buffer', async ({ assert }) => {
         const Drive = app.container.resolveBinding('Adonis/Core/Drive');
         const server = (0, http_1.createServer)((req, res) => {
             const ctx = app.container.resolveBinding('Adonis/Core/HttpContext').create('/', {}, req, res);
@@ -211,7 +211,7 @@ japa_1.default.group('Attachment | fromBuffer', (group) => {
         const { body } = await (0, supertest_1.default)(server).post('/');
         assert.isTrue(await Drive.exists(body.name));
     });
-    (0, japa_1.default)('pre-compute url for newly-created images', async (assert) => {
+    (0, runner_1.test)('pre-compute url for newly-created images', async ({ assert }) => {
         const Drive = app.container.resolveBinding('Adonis/Core/Drive');
         const server = (0, http_1.createServer)((req, res) => {
             const ctx = app.container.resolveBinding('Adonis/Core/HttpContext').create('/', {}, req, res);
@@ -232,7 +232,7 @@ japa_1.default.group('Attachment | fromBuffer', (group) => {
         const { body } = await (0, supertest_1.default)(server).post('/');
         assert.isDefined(body.url);
     });
-    (0, japa_1.default)('delete local images', async (assert) => {
+    (0, runner_1.test)('delete local images', async ({ assert }) => {
         const Drive = app.container.resolveBinding('Adonis/Core/Drive');
         const server = (0, http_1.createServer)((req, res) => {
             const ctx = app.container.resolveBinding('Adonis/Core/HttpContext').create('/', {}, req, res);
@@ -255,17 +255,17 @@ japa_1.default.group('Attachment | fromBuffer', (group) => {
         assert.isFalse(await Drive.exists(body.name));
     });
 });
-japa_1.default.group('Attachment | errors', (group) => {
-    group.before(async () => {
+runner_1.test.group('Attachment | errors', (group) => {
+    group.setup(async () => {
         app = await (0, test_helpers_1.setupApplication)();
         await (0, test_helpers_1.setup)(app);
         app.container.resolveBinding('Adonis/Core/Route').commit();
         Attachment_1.Attachment.setDrive(app.container.resolveBinding('Adonis/Core/Drive'));
     });
-    group.after(async () => {
+    group.teardown(async () => {
         await (0, test_helpers_1.cleanup)(app);
     });
-    (0, japa_1.default)('throw error if a `falsy` value is provided to `fromFile` method', async (assert) => {
+    (0, runner_1.test)('throw error if a `falsy` value is provided to `fromFile` method', async ({ assert }) => {
         const server = (0, http_1.createServer)((req, res) => {
             const ctx = app.container.resolveBinding('Adonis/Core/HttpContext').create('/', {}, req, res);
             app.container.make(BodyParser_1.BodyParserMiddleware).handle(ctx, async () => {
@@ -284,7 +284,7 @@ japa_1.default.group('Attachment | errors', (group) => {
         });
         await (0, supertest_1.default)(server).post('/');
     });
-    (0, japa_1.default)('throw error if an invalid DB value is provided to `fromDbResponse` method', async (assert) => {
+    (0, runner_1.test)('throw error if an invalid DB value is provided to `fromDbResponse` method', async ({ assert, }) => {
         const server = (0, http_1.createServer)((req, res) => {
             const ctx = app.container.resolveBinding('Adonis/Core/HttpContext').create('/', {}, req, res);
             app.container.make(BodyParser_1.BodyParserMiddleware).handle(ctx, async () => {
