@@ -146,7 +146,7 @@ declare module '@ioc:Adonis/Addons/AttachmentLite' {
   export interface AttachmentConstructorContract {
     new (attributes: AttachmentAttributes, file?: MultipartFileContract): AttachmentContract
     fromFile(file: MultipartFileContract): AttachmentContract
-    fromBuffer(buffer: Buffer): Promise<AttachmentContract>
+    fromBuffer(buffer: Buffer, name?: string): Promise<AttachmentContract>
     fromDbResponse(response: string): AttachmentContract
     getDrive(): DriveManagerContract
     setDrive(drive: DriveManagerContract): void

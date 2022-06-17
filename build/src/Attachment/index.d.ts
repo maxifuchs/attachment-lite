@@ -27,7 +27,7 @@ export declare class Attachment implements AttachmentContract {
      * file
      */
     static fromFile(file: MultipartFileContract): Attachment;
-    static fromBuffer(buffer: Buffer): Promise<Attachment>;
+    static fromBuffer(buffer: Buffer, name?: string): Promise<Attachment>;
     /**
      * Create attachment instance from the database response
      */

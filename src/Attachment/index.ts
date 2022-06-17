@@ -62,7 +62,7 @@ export class Attachment implements AttachmentContract {
     return new Attachment(attributes, file)
   }
 
-  public static fromBuffer(buffer: Buffer): Promise<Attachment> {
+  public static fromBuffer(buffer: Buffer, name?: string): Promise<Attachment> {
     return new Promise((resolve, reject) => {
       try {
         type BufferProperty = { ext: string; mime: string }
@@ -84,6 +84,7 @@ export class Attachment implements AttachmentContract {
           extname: ext,
           mimeType: mime,
           size: buffer.length,
+          name: name,
         }
 
         return resolve(new Attachment(attributes, null, buffer))

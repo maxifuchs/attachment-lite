@@ -79,7 +79,7 @@ class Attachment {
         };
         return new Attachment(attributes, file);
     }
-    static fromBuffer(buffer) {
+    static fromBuffer(buffer, name) {
         return new Promise((resolve, reject) => {
             try {
                 let bufferProperty;
@@ -97,6 +97,7 @@ class Attachment {
                     extname: ext,
                     mimeType: mime,
                     size: buffer.length,
+                    name: name,
                 };
                 return resolve(new Attachment(attributes, null, buffer));
             }
